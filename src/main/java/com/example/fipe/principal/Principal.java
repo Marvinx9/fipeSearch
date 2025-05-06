@@ -1,6 +1,7 @@
 package com.example.fipe.principal;
 
 import com.example.fipe.model.DadosMarca;
+import com.example.fipe.model.Marca;
 import com.example.fipe.service.ConsumoApi;
 import com.example.fipe.service.ConverteDados;
 import com.example.fipe.service.LimpaString;
@@ -8,6 +9,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Principal {
     private Scanner leitura = new Scanner(System.in);
@@ -22,8 +24,10 @@ public class Principal {
         var tipoVeiculo = leitura.nextLine();
 
         var json = consumo.obterDados(ENDERECO + limpaString.removeSpecialCharacters(tipoVeiculo).toLowerCase() + "/marcas");
-        List<DadosMarca> dados = conversor.obterDados(json, new TypeReference<List<DadosMarca>>() {});
-        dados.forEach(System.out::println);
+        List<DadosMarca> dados = conversor.obterDados(json, new TypeReference<>() {});
 
+        List<Marca> marcas = dados.stream().map(Marca::new).toList();
+
+        marcas.forEach(System.out::println);
     }
 }
