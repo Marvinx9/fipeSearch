@@ -1,9 +1,6 @@
 package com.example.fipe.principal;
 
-import com.example.fipe.model.DadosMarca;
-import com.example.fipe.model.DadosModelo;
-import com.example.fipe.model.Marca;
-import com.example.fipe.model.Modelo;
+import com.example.fipe.model.*;
 import com.example.fipe.service.ConsumoApi;
 import com.example.fipe.service.ConverteDados;
 import com.example.fipe.service.LimpaString;
@@ -37,6 +34,7 @@ public class Principal {
 
         System.out.println("\nInforme o código da marca para consulta:");
         int codigo = leitura.nextInt();
+        leitura.nextLine();
 
         String enderecoModelos = enderecoMarca + "/" + codigo + "/modelos";
         var jsonModelos = consumo.obterDados(enderecoModelos);
@@ -50,5 +48,37 @@ public class Principal {
 
         List<Modelo> modelos = dadosmodelos.stream().map(Modelo::new).toList();
         modelos.forEach(System.out::println);
+
+        System.out.println("\nDigite um trecho do nome do veículo para consulta:");
+        var filtroPorModelo = leitura.nextLine();
+
+        Modelo veiculo = null;
+        for (Modelo modelo : modelos) {
+            if(modelo.getDescricao().toLowerCase().trim().contains(filtroPorModelo.trim().toLowerCase())) {
+                veiculo = modelo;
+            }
+        }
+
+        if (veiculo == null) {
+            throw new RuntimeException("veiculo não encontrado nessa sessão");
+        }
+
+        String  anosVeiculo = enderecoModelos + "/" + veiculo.getCod() + "/anos";
+
+        var jsonVeiculos = consumo.obterDados(anosVeiculo);
+        List<DadosVeiculo> dadosVeiculos = conversor.obterDados(jsonVeiculos, new TypeReference<>() {});
+
+        List<Veiculo> veiculos = dadosVeiculos.stream().map(Veiculo::new).toList();
+        veiculos.forEach(System.out::println);
+
+        System.out.println("Digite o código do ano referente ao seu veículo");
+        var ano = leitura.nextLine();
+
+        String buscaPorAno = anosVeiculo + "/" + ano;
+        var jsonFipeData = consumo.obterDados(buscaPorAno);
+
+        DadosFipeData dadosFipe = conversor.converteFipe(jsonFipeData, new TypeReference<>() {});
+
+        System.out.println(dadosFipe.toString());
     }
 }

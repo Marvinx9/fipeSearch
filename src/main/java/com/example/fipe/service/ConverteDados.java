@@ -18,4 +18,13 @@ public class ConverteDados implements IConverteDados {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public <T> T converteFipe(String json, TypeReference<T> typeRef) {
+        try {
+            return mapper.readValue(json, typeRef);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
